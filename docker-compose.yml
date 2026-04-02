@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: complaint-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_H2_CONSOLE_ENABLED=true
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: complaint-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: always
