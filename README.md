@@ -16,6 +16,19 @@ A full-stack application built with **Spring Boot** and **React** that automatic
 - **Email**: `demo@example.com`
 - **Password**: `pass123`
 
+## 🌐 Render Deployment
+The project is configured for easy deployment on **Render**.
+
+### 1. Backend (Spring Boot)
+- **Environment Variable**: `SPRING_PROFILES_ACTIVE=prod`
+- **Port**: 8081
+- **CORS Config**: The backend [CorsConfig.java](file:///c:/Users/vamsh/OneDrive/Desktop/complaint/backend/src/main/java/com/complaint/system/config/CorsConfig.java) is pre-configured to allow the Render frontend.
+
+### 2. Frontend (React)
+- **Build Command**: `npm run build`
+- **Auto-Detection**: The frontend [api.js](file:///c:/Users/vamsh/OneDrive/Desktop/complaint/frontend/src/api.js) automatically identifies your Render backend URL.
+- **Manual Overwrite**: Set `REACT_APP_API_URL` to your backend URL in Render if needed.
+
 ## ✨ Features
 - **Smart Classification**: Automatically detects categories (Water, Electricity, Roads, Sanitation, etc.) from complaint text.
 - **Auto-Assignment**: Maps categories to specific departments (e.g., Water Supply Board, PWD).
