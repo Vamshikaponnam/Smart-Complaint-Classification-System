@@ -50,7 +50,18 @@ export default function AuthPage() {
         setAlert({ type: 'error', msg: data.message });
       }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Server error. Make sure the backend is running.';
+      let msg = 'An unexpected error occurred.';
+      if (err.code === 'ERR_NETWORK') {
+        msg = 'Connection failed. Please ensure the backend is running and reachable.';
+      } else if (err.response?.data?.message) {
+        msg = err.response.data.message;
+      } else if (err.response?.data?.error) {
+        msg = err.response.data.error;
+      } else if (err.response?.status === 404) {
+        msg = 'API endpoint not found (404). Check backend configuration.';
+      } else {
+        msg = 'Server error. Please try again later.';
+      }
       setAlert({ type: 'error', msg });
     } finally {
       setLoading(false);
