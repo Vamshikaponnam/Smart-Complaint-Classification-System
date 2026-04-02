@@ -15,41 +15,44 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class ComplaintController {
 
-    @Autowired private ComplaintService complaintService;
-    @Autowired private AiService  aiService;
-    
+    @Autowired
+    private ComplaintService complaintService;
+    @Autowired
+    private AiService aiService;
+
     @GetMapping("/health")
-    public String health() { return "OK"; }
+    public String health() {
+        return "OK";
+    }
 
     // ─── COMPLAINT CRUD ──────────────────────────────────────────────────────
 
     /** POST /api/complaint — Submit a new complaint with optional image */
-    @PostMapping(value = "/complaint", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/complaint", consumes = { "multipart/form-data" })
     public ResponseEntity<Map<String, Object>> submitComplaint(
             @RequestPart("complaint") String complaintJson,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        
+
         try {
             ObjectMapper mapper = new ObjectMapper();
             Complaint complaint = mapper.readValue(complaintJson, Complaint.class);
-            
+
             byte[] imageBytes = (image != null) ? image.getBytes() : null;
             Complaint saved = complaintService.submitComplaint(complaint, imageBytes);
-            
+
             return ResponseEntity.ok(Map.of(
-                "success",      true,
-                "message",      "Complaint submitted successfully!",
-                "id",           saved.getId(),
-                "category",     saved.getCategory(),
-                "department",   saved.getDepartment(),
-                "status",       saved.getStatus(),
-                "aiReasoning",  saved.getAiReasoning() != null ? saved.getAiReasoning() : "",
-                "aiEnabled",    aiService.isEnabled(),
-                "complaint",    saved
-            ));
+                    "success", true,
+                    "message", "Complaint submitted successfully!",
+                    "id", saved.getId(),
+                    "category", saved.getCategory(),
+                    "department", saved.getDepartment(),
+                    "status", saved.getStatus(),
+                    "aiReasoning", saved.getAiReasoning() != null ? saved.getAiReasoning() : "",
+                    "aiEnabled", aiService.isEnabled(),
+                    "complaint", saved));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
@@ -80,23 +83,21 @@ public class ComplaintController {
     public ResponseEntity<Map<String, Object>> updateStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
- 
+
         String status = body.get("status");
-        String note   = body.get("note"); // optional professional response
+        String note = body.get("note"); // optional professional response
 
         if (status == null || status.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Status value is required."
-            ));
+                    "success", false,
+                    "message", "Status value is required."));
         }
         try {
             Complaint updated = complaintService.updateStatus(id, status, note);
             return ResponseEntity.ok(Map.of(
-                "success",   true,
-                "message",   "Status updated to: " + status,
-                "complaint", updated
-            ));
+                    "success", true,
+                    "message", "Status updated to: " + status,
+                    "complaint", updated));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -117,16 +118,15 @@ public class ComplaintController {
 
         return complaintService.getComplaintById(id)
                 .map(complaint -> {
-                    Integer rating   = (Integer) body.get("rating");
-                    String  feedback = (String)  body.get("feedback");
+                    Integer rating = (Integer) body.get("rating");
+                    String feedback = (String) body.get("feedback");
                     complaint.setRating(rating);
                     complaint.setFeedback(feedback);
                     Complaint saved = complaintService.saveRaw(complaint);
                     return ResponseEntity.ok(Map.of(
-                        "success",   true,
-                        "message",   "Feedback submitted successfully!",
-                        "complaint", saved
-                    ));
+                            "success", true,
+                            "message", "Feedback submitted successfully!",
+                            "complaint", saved));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -135,9 +135,8 @@ public class ComplaintController {
     @GetMapping("/user/impact")
     public ResponseEntity<Map<String, Object>> getUserImpact(@RequestParam String email) {
         return ResponseEntity.ok(Map.of(
-            "success", true,
-            "impact",  complaintService.getUserImpactData(email)
-        ));
+                "success", true,
+                "impact", complaintService.getUserImpactData(email)));
     }
 
     // ─── AI ENDPOINTS ────────────────────────────────────────────────────────
@@ -146,39 +145,37 @@ public class ComplaintController {
     @GetMapping("/user/impact-report")
     public ResponseEntity<Map<String, Object>> getUserImpactReport(@RequestParam String email) {
         return ResponseEntity.ok(Map.of(
-            "success", true,
-            "report",  complaintService.getUserImpactReport(email)
-        ));
+                "success", true,
+                "report", complaintService.getUserImpactReport(email)));
     }
 
     /** GET /api/analytics/next-week-strategy — AI Strategic Forecast */
     @GetMapping("/analytics/next-week-strategy")
     public ResponseEntity<Map<String, Object>> getNextWeekStrategy() {
         return ResponseEntity.ok(Map.of(
-            "success",  true,
-            "strategy", complaintService.getNextWeekStrategy()
-        ));
+                "success", true,
+                "strategy", complaintService.getNextWeekStrategy()));
     }
 
     /** GET /api/analytics/alerts — Real-time Anomaly Alerts */
     @GetMapping("/analytics/alerts")
     public ResponseEntity<Map<String, Object>> getAnomalyAlerts() {
         return ResponseEntity.ok(Map.of(
-            "success", true,
-            "alerts",  complaintService.getAnomalyAlerts()
-        ));
+                "success", true,
+                "alerts", complaintService.getAnomalyAlerts()));
     }
 
     /** GET /api/governance/value-saved — Economic impact of AI municipal actions */
     @GetMapping("/governance/value-saved")
     public ResponseEntity<Map<String, Object>> getMunicipalValue() {
         return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data",    complaintService.getMunicipalValueReport()
-        ));
+                "success", true,
+                "data", complaintService.getMunicipalValueReport()));
     }
 
-    /** POST /api/governance/marketplace/redeem — Spend impact points on civic perks */
+    /**
+     * POST /api/governance/marketplace/redeem — Spend impact points on civic perks
+     */
     @PostMapping("/governance/marketplace/redeem")
     public ResponseEntity<Map<String, Object>> redeemPerk(@RequestBody Map<String, String> request) {
         return ResponseEntity.ok(complaintService.redeemPerk(request.get("email"), request.get("perkName")));
@@ -202,10 +199,15 @@ public class ComplaintController {
         return ResponseEntity.ok(complaintService.getSustainabilityReport());
     }
 
-    /** POST /api/governance/proposals/{id}/pledge — Crowdfunding pledge for city projects */
+    /**
+     * POST /api/governance/proposals/{id}/pledge — Crowdfunding pledge for city
+     * projects
+     */
     @PostMapping("/governance/proposals/{id}/pledge")
-    public ResponseEntity<Map<String, Object>> pledgeToProposal(@PathVariable Long id, @RequestBody Map<String, Object> request) {
-        return ResponseEntity.ok(complaintService.pledgeToProposal((String)request.get("email"), id, (Integer)request.get("points")));
+    public ResponseEntity<Map<String, Object>> pledgeToProposal(@PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
+        return ResponseEntity.ok(
+                complaintService.pledgeToProposal((String) request.get("email"), id, (Integer) request.get("points")));
     }
 
     /** GET /api/governance/benchmarks — World-class city comparison KPIs */
@@ -220,16 +222,17 @@ public class ComplaintController {
         return ResponseEntity.ok(complaintService.getZenithLedger());
     }
 
-    /** GET /api/complaints/{id}/ai-suggest — Get AI-generated resolution suggestion */
+    /**
+     * GET /api/complaints/{id}/ai-suggest — Get AI-generated resolution suggestion
+     */
     @GetMapping("/complaints/{id}/ai-suggest")
     public ResponseEntity<Map<String, Object>> getAiSuggestion(@PathVariable Long id) {
         try {
             String suggestion = complaintService.getResolutionSuggestion(id);
             return ResponseEntity.ok(Map.of(
-                "success",    true,
-                "suggestion", suggestion,
-                "aiEnabled",  aiService.isEnabled()
-            ));
+                    "success", true,
+                    "suggestion", suggestion,
+                    "aiEnabled", aiService.isEnabled()));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -241,10 +244,9 @@ public class ComplaintController {
         try {
             String draft = complaintService.getAiResponseDraft(id);
             return ResponseEntity.ok(Map.of(
-                "success",   true,
-                "draft",     draft,
-                "aiEnabled", aiService.isEnabled()
-            ));
+                    "success", true,
+                    "draft", draft,
+                    "aiEnabled", aiService.isEnabled()));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -253,16 +255,16 @@ public class ComplaintController {
     /**
      * POST /api/ai/chat
      * Citizen chatbot — proxies messages to Gemini.
-     * Body: { "message": "...", "history": [{"role":"user","text":"..."},{"role":"model","text":"..."}] }
+     * Body: { "message": "...", "history":
+     * [{"role":"user","text":"..."},{"role":"model","text":"..."}] }
      */
     @PostMapping("/ai/chat")
     public ResponseEntity<Map<String, Object>> chat(@RequestBody Map<String, Object> body) {
         String message = (String) body.get("message");
         if (message == null || message.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "reply",   "Message cannot be empty."
-            ));
+                    "success", false,
+                    "reply", "Message cannot be empty."));
         }
 
         @SuppressWarnings("unchecked")
@@ -270,10 +272,9 @@ public class ComplaintController {
 
         String reply = aiService.chat(message, history);
         return ResponseEntity.ok(Map.of(
-            "success",   true,
-            "reply",     reply,
-            "aiEnabled", aiService.isEnabled()
-        ));
+                "success", true,
+                "reply", reply,
+                "aiEnabled", aiService.isEnabled()));
     }
 
     /** GET /api/classify — Test classification without saving */
@@ -281,44 +282,45 @@ public class ComplaintController {
     public ResponseEntity<Map<String, Object>> classify(@RequestParam String text) {
         Map<String, String> result = complaintService.classifyWithAi(text);
         return ResponseEntity.ok(Map.of(
-            "category",   result.get("category"),
-            "department", result.get("department"),
-            "reasoning",  result.get("reasoning"),
-            "aiEnabled",  aiService.isEnabled()
-        ));
+                "category", result.get("category"),
+                "department", result.get("department"),
+                "reasoning", result.get("reasoning"),
+                "aiEnabled", aiService.isEnabled()));
     }
 
     @GetMapping("/ai/status")
     public ResponseEntity<Map<String, Object>> aiStatus() {
         return ResponseEntity.ok(Map.of(
-            "aiEnabled", aiService.isEnabled(),
-            "message",   aiService.isEnabled()
-                ? "Smart AI Assistant is active."
-                : "Running in keyword-fallback mode. Add your AI API key to enable AI."
-        ));
+                "aiEnabled", aiService.isEnabled(),
+                "message", aiService.isEnabled()
+                        ? "Smart AI Assistant is active."
+                        : "Running in keyword-fallback mode. Add your AI API key to enable AI."));
     }
 
-    /** GET /api/analytics/insights — Get AI-powered strategic insights for admins */
+    /**
+     * GET /api/analytics/insights — Get AI-powered strategic insights for admins
+     */
     @GetMapping("/analytics/insights")
     public ResponseEntity<Map<String, Object>> getStrategicInsights() {
         String insights = complaintService.getAiStrategicInsights();
         return ResponseEntity.ok(Map.of(
-            "success",   true,
-            "insights",  insights,
-            "aiEnabled", aiService.isEnabled()
-        ));
+                "success", true,
+                "insights", insights,
+                "aiEnabled", aiService.isEnabled()));
     }
 
     /** GET /api/analytics/zonal-health — Geographic Heatmap Data */
     @GetMapping("/analytics/daily-route")
     public ResponseEntity<Map<String, Object>> getDailyRoute() {
         return ResponseEntity.ok(Map.of(
-            "success", true,
-            "route",   complaintService.getDailyMaintenanceRoute()
-        ));
+                "success", true,
+                "route", complaintService.getDailyMaintenanceRoute()));
     }
 
-    /** POST /api/admin/trigger-oracle — Manually trigger the preventive infrastructure oracle */
+    /**
+     * POST /api/admin/trigger-oracle — Manually trigger the preventive
+     * infrastructure oracle
+     */
     @PostMapping("/admin/trigger-oracle")
     public ResponseEntity<Complaint> triggerOracle() {
         return ResponseEntity.ok(complaintService.triggerPreventiveOracle());
@@ -328,9 +330,9 @@ public class ComplaintController {
     @PostMapping("/ai/mediate")
     public ResponseEntity<Map<String, Object>> mediate(@RequestBody Map<String, String> request) {
         return ResponseEntity.ok(Map.of(
-            "success",   true,
-            "mediation", complaintService.mediateNeighborDispute(request.get("userA"), request.get("userB"), request.get("issue"))
-        ));
+                "success", true,
+                "mediation", complaintService.mediateNeighborDispute(request.get("userA"), request.get("userB"),
+                        request.get("issue"))));
     }
 
     /** GET /api/analytics/forecast — Municipal Predictive Forecast */
@@ -338,10 +340,9 @@ public class ComplaintController {
     public ResponseEntity<Map<String, Object>> getPredictiveForecast() {
         String forecast = complaintService.getAiPredictiveForecast();
         return ResponseEntity.ok(Map.of(
-            "success",   true,
-            "forecast",  forecast,
-            "aiEnabled", aiService.isEnabled()
-        ));
+                "success", true,
+                "forecast", forecast,
+                "aiEnabled", aiService.isEnabled()));
     }
 
     /** GET /api/analytics/feedback — AI Community Sentiment Analysis */
@@ -349,10 +350,9 @@ public class ComplaintController {
     public ResponseEntity<Map<String, Object>> getFeedbackAnalysis() {
         String analysis = complaintService.getAiFeedbackAnalysis();
         return ResponseEntity.ok(Map.of(
-            "success",   true,
-            "analysis",  analysis,
-            "aiEnabled", aiService.isEnabled()
-        ));
+                "success", true,
+                "analysis", analysis,
+                "aiEnabled", aiService.isEnabled()));
     }
 
     /** POST /api/complaints/check-similarity — Check if complaint already exists */

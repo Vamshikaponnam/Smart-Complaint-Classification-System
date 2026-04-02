@@ -18,6 +18,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
             "http://localhost:3000",
+            "http://127.0.0.1:3000",
             "https://smart-complaint-frontend.onrender.com"
         ));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
