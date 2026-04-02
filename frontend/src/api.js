@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    const serviceName = window.location.hostname.split('.')[0];
+    const backendName = serviceName.replace('frontend', 'backend');
+    return `https://${backendName}.onrender.com/api`;
+  }
+  return '/api';
+};
+
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '/api',
+  baseURL: getBaseURL(),
   headers: { 'Content-Type': 'application/json' },
 });
 
