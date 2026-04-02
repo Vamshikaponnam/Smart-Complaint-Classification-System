@@ -318,6 +318,7 @@ public class AiService {
 
     public String generatePredictiveForecast(String h) { return callAi("Analyze this complaint history and predict next month's risks in 3 sentences: " + h); }
     public String generateFeedbackAnalysis(String f) { return callAi("Analyze this citizen feedback and summarize sentiment: " + f); }
+    public String generateStrategicInsights(String h) { return callAi("Analyze these complaint trends and provide high-level strategic insights: " + h); }
     public Long findMostSimilarComplaint(String n, List<Complaint> e) { return null; } // Placeholder
     public List<Long> rankBySemanticRelevance(String q, List<Complaint> c) { return new ArrayList<>(); } // Placeholder
     public String generateUserImpactSummary(String e, String h) { return callAi("Summarize this citizen's impact based on their reports: " + h); }
