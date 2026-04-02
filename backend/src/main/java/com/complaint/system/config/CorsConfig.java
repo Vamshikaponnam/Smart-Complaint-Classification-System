@@ -15,18 +15,20 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "https://smart-complaint-frontend.onrender.com"
-        ));
+
+        // ✅ FIXED PART (only changes here)
+        config.setAllowCredentials(false);
+        config.setAllowedOriginPatterns(List.of("*"));
+
+        // existing configs
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+
+        // ✅ changed from "/api/**" → "/**"
+        source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
     }
