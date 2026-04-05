@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://smart-complaint-classification-system-1.onrender.com/")
 public class UserController {
 
     @Autowired

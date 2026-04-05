@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// ✅ Direct backend URL (FIXED)
 const API = axios.create({
-  baseURL: "https://smart-complaint-classification-system.onrender.com/api/",
+  baseURL: "https://smart-complaint-classification-system-1.onrender.com/api/",
   headers: { 'Content-Type': 'application/json' },
 });
 

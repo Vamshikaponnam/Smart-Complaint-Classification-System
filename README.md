@@ -12,7 +12,7 @@ A state-of-the-art **Strategic Governance Platform** leveraging **Multi-modal AI
 
 1. Double-click the **`start_all.bat`** script in the root folder.
 2. Wait for both servers to initialize.
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+3. Access the live platform at [smart-complaint-classification-system-1.onrender.com](https://smart-complaint-classification-system-1.onrender.com/).
 
 ---
 
@@ -20,7 +20,7 @@ A state-of-the-art **Strategic Governance Platform** leveraging **Multi-modal AI
 
 1. Ensure **Docker Desktop** is running.
 2. Run `docker-compose up -d --build` in the root folder.
-3. Access the UI at `http://localhost:3000`.
+3. Access the UI at `https://smart-complaint-classification-system-1.onrender.com/`.
 
 ---
 

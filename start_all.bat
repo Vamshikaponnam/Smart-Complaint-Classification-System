@@ -14,9 +14,7 @@ echo STARTING FRONTEND (React on port 3000)...
 start /B "Frontend" cmd /c "cd frontend && npm start"
 
 echo.
-echo ==========================================
-echo  URLs:
-echo  - Frontend: http://localhost:3000
+echo  - Frontend (LIVE): https://smart-complaint-classification-system-1.onrender.com/
 echo  - Backend: http://localhost:8081
 echo  - H2 Console: http://localhost:8081/h2-console
 echo ==========================================
